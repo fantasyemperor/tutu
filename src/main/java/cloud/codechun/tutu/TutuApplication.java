@@ -1,9 +1,13 @@
 package cloud.codechun.tutu;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 @SpringBootApplication
+@MapperScan("cloud.codechun.tutu.mapper")
+@EnableAspectJAutoProxy(exposeProxy = true)
 public class TutuApplication {
 
     public static void main(String[] args) {
