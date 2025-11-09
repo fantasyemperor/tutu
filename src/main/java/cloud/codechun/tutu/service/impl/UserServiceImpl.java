@@ -3,20 +3,27 @@ package cloud.codechun.tutu.service.impl;
 import cloud.codechun.tutu.exception.BusinessException;
 import cloud.codechun.tutu.exception.ErrorCode;
 import cloud.codechun.tutu.model.entity.UserRoleEnum;
+import cloud.codechun.tutu.model.vo.LoginUserVO;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import cloud.codechun.tutu.model.entity.User;
 import cloud.codechun.tutu.service.UserService;
 import cloud.codechun.tutu.mapper.UserMapper;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+import static cloud.codechun.tutu.common.PasswordUtil.encryptCode;
+import static cloud.codechun.tutu.common.PasswordUtil.verifyCode;
 
 /**
 * @author hanjichun
 * @description 针对表【user(用户)】的数据库操作Service实现
 * @createDate 2025-11-08 13:19:44
 */
+
+@Slf4j
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     implements UserService{
@@ -44,7 +51,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号重复");
         }
         // 3. 加密
-        String encryptPassword = getEncryptPassword(userPassword);
+        String encryptPassword = encryptCode(userPassword);
         // 4. 插入数据
         User user = new User();
         user.setUserAccount(userAccount);
@@ -58,6 +65,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         return user.getId();
     }
 
+
+    /**
+     * 加密密码
+     */
     @Override
     public String getEncryptPassword(String userPassword) {
         // 盐值，混淆密码
@@ -65,6 +76,70 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         return DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
     }
 
+    @Override
+    public LoginUserVO userLogin(String userAccount, String userPassword, HttpServletRequest request) {
+
+        if (StrUtil.hasBlank(userAccount, userPassword)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"参数为空");
+        }
+
+        if(userAccount.length()<4){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"账号太短");
+        }
+
+        if(userAccount.length()>8){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"账号太长");
+        }
+
+        if(userPassword.length()<4){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"密码太短");
+        }
+
+        if(userPassword.length()>8){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"密码太长");
+        }
+
+        /**
+         * 用密码工具类中的加密方法对密码进行加密
+         */
+        String encryptPassword = encryptCode(userPassword);
+
+        /**
+         * 查询用户是否存在
+         */
+
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("userAccount", userAccount);
+
+        /**
+         * 得到sql查询后到user
+         */
+        User user = this.baseMapper.selectOne(queryWrapper);
+
+        if (user == null){
+            log.info("用户不存在");
+        }
+
+        if(!verifyCode(userPassword,user.getUserPassword()))
+        {
+            log.info("密码不正确");
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        return null;
+    }
 
 
 }
