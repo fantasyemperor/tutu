@@ -16,13 +16,17 @@ public interface UserService extends IService<User> {
     long userRegister(String userAccount, String userPassword,String checkPassword);
 
 
-    /**
-     *获取加密后的密码
-     */
-    String getEncryptPassword(String userPassword);
+
 
     LoginUserVO userLogin(String userAccount, String userPassword, HttpServletRequest request);
 
+
+    /**
+     * 获取脱敏的已登录用户信息
+     *
+     * @return
+     */
+    LoginUserVO getLoginUserVO(User user);
 
 
 

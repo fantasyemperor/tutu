@@ -12,10 +12,12 @@ import cloud.codechun.tutu.service.UserService;
 import cloud.codechun.tutu.mapper.UserMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 import static cloud.codechun.tutu.common.PasswordUtil.encryptCode;
 import static cloud.codechun.tutu.common.PasswordUtil.verifyCode;
+import static cloud.codechun.tutu.constant.UserConstant.USER_LOGIN_STATE;
 
 /**
 * @author hanjichun
@@ -66,15 +68,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     }
 
 
-    /**
-     * 加密密码
-     */
-    @Override
-    public String getEncryptPassword(String userPassword) {
-        // 盐值，混淆密码
-        final String SALT = "yupi";
-        return DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
-    }
+
 
     @Override
     public LoginUserVO userLogin(String userAccount, String userPassword, HttpServletRequest request) {
@@ -102,7 +96,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         /**
          * 用密码工具类中的加密方法对密码进行加密
          */
-        String encryptPassword = encryptCode(userPassword);
+//        String encryptPassword = encryptCode(userPassword);
 
         /**
          * 查询用户是否存在
@@ -126,23 +120,24 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
 
 
+        request.getSession().setAttribute(USER_LOGIN_STATE,user);
+
+        return this.getLoginUserVO(user);
+    }
 
 
-
-
-
-
-
-
-
-
-
-
-        return null;
+    @Override
+    public LoginUserVO getLoginUserVO(User user) {
+        if (user == null) return null;
+        LoginUserVO loginUserVO = new LoginUserVO();
+        BeanUtils.copyProperties(user, loginUserVO);
+        return loginUserVO;
     }
 
 
 }
+
+
 
 
 
