@@ -2,19 +2,19 @@ package cloud.codechun.tutu.service.impl;
 
 import cloud.codechun.tutu.exception.BusinessException;
 import cloud.codechun.tutu.exception.ErrorCode;
+import cloud.codechun.tutu.mapper.UserMapper;
+import cloud.codechun.tutu.model.entity.User;
 import cloud.codechun.tutu.model.entity.UserRoleEnum;
 import cloud.codechun.tutu.model.vo.LoginUserVO;
+import cloud.codechun.tutu.service.UserService;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import cloud.codechun.tutu.model.entity.User;
-import cloud.codechun.tutu.service.UserService;
-import cloud.codechun.tutu.mapper.UserMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.util.DigestUtils;
+
 import static cloud.codechun.tutu.common.PasswordUtil.encryptCode;
 import static cloud.codechun.tutu.common.PasswordUtil.verifyCode;
 import static cloud.codechun.tutu.constant.UserConstant.USER_LOGIN_STATE;
@@ -39,8 +39,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (userAccount.length() < 4) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户账号过短");
         }
+        if(userAccount.length()>11){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"账号太长");
+        }
         if (userPassword.length() < 8 || checkPassword.length() < 8) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户密码过短");
+        }
+        if(userPassword.length()>15){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"密码太长");
         }
         if (!userPassword.equals(checkPassword)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "两次输入的密码不一致");
@@ -81,7 +87,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"账号太短");
         }
 
-        if(userAccount.length()>8){
+        if(userAccount.length()>11){
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"账号太长");
         }
 
@@ -89,7 +95,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"密码太短");
         }
 
-        if(userPassword.length()>8){
+        if(userPassword.length()>15){
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"密码太长");
         }
 
@@ -111,12 +117,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         User user = this.baseMapper.selectOne(queryWrapper);
 
         if (user == null){
-            log.info("用户不存在");
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR,"用户不存在") ;
         }
 
         if(!verifyCode(userPassword,user.getUserPassword()))
         {
-            log.info("密码不正确");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"密码错误");
         }
 
 
