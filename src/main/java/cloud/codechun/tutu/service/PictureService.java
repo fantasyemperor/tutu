@@ -1,4 +1,4 @@
-package cloud.codechun.tutu.service;
-
-public interface PictureService {
-}
+//package cloud.codechun.tutu.service;
+//
+//public interface PictureService {
+//}

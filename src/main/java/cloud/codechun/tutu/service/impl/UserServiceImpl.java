@@ -135,12 +135,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     }
 
 
+
     @Override
     public LoginUserVO getLoginUserVO(User user) {
         if (user == null) return null;
         LoginUserVO loginUserVO = new LoginUserVO();
         BeanUtils.copyProperties(user, loginUserVO);
         return loginUserVO;
+    }
+
+    /**
+     * 获取当前登录用户信息
+     */
+    public User getLoginUser(HttpServletRequest request) {
+        Object temp = request.getSession().getAttribute(USER_LOGIN_STATE);
+        User user = new User();
+        BeanUtils.copyProperties(temp, user);
+        return user;
     }
 
 

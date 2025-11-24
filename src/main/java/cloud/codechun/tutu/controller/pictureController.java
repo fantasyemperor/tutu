@@ -1,7 +1,7 @@
 package cloud.codechun.tutu.controller;
 
 
-import cloud.codechun.tutu.service.PictureService;
+//import cloud.codechun.tutu.service.PictureService;
 import cloud.codechun.tutu.service.UserService;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
  */
 public class pictureController {
 
-    @Resource
-    private PictureService pictureService;
+//    @Resource
+//    private PictureService pictureService;
 
     /**
      *上传图片
