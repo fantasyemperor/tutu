@@ -149,9 +149,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
      */
     public User getLoginUser(HttpServletRequest request) {
         Object temp = request.getSession().getAttribute(USER_LOGIN_STATE);
+        if(temp == null){
+            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
+        }
         User user = new User();
         BeanUtils.copyProperties(temp, user);
         return user;
+    }
+
+    @Override
+    public boolean userLogout(HttpServletRequest request) {
+
+        Object temp = request.getSession().getAttribute(USER_LOGIN_STATE);
+        if(temp == null){
+            throw new BusinessException(ErrorCode.OPERATION_ERROR,"未登录");
+        }
+        request.getSession().removeAttribute(USER_LOGIN_STATE);
+
+
+        return true;
     }
 
 

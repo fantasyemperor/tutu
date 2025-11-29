@@ -89,6 +89,12 @@
                 <version>1.18.40</version>
                 <scope>provided</scope>
             </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>dashscope-sdk-java</artifactId>
+            <!-- 请将 'the-latest-version' 替换为最新版本号：https://mvnrepository.com/artifact/com.alibaba/dashscope-sdk-java -->
+            <version>2.22.2</version>
+        </dependency>
 
 
     </dependencies>

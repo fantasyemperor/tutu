@@ -11,6 +11,7 @@ import cloud.codechun.tutu.model.vo.LoginUserVO;
 import cloud.codechun.tutu.service.UserService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,6 +44,13 @@ public class UserController {
         String userPassword = userLoginRequest.getUserPassword();
         LoginUserVO loginUserVO = userService.userLogin(userAccount, userPassword, httpServletRequest);
         return ResultUtils.success(loginUserVO);
+    }
+
+    @PostMapping("/logout")
+    public BaseResponse<Boolean> userLogout(HttpServletRequest request){
+
+        boolean result = userService.userLogout(request);
+        return ResultUtils.success(result);
     }
 
 
