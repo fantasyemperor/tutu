@@ -12,6 +12,6 @@ public class TutuApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(TutuApplication.class, args);
-    }
 
+    }
 }

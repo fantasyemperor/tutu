@@ -1,4 +1,4 @@
-package cloud.codechun.tutu.api.aliyunai;// dashscope SDK的版本 >= 2.19.0
+package cloud.codechun.tutu.api.test1;// dashscope SDK的版本 >= 2.19.0
 import java.util.*;
 
 import org.slf4j.Logger;

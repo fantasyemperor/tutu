@@ -1,4 +1,4 @@
-package cloud.codechun.tutu.api.aliyunai;// DashScope SDK版本需要不低于2.18.3
+package cloud.codechun.tutu.api.test1;// DashScope SDK版本需要不低于2.18.3
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Collections;
