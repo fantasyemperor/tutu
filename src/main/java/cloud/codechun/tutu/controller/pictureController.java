@@ -19,17 +19,17 @@ public class pictureController {
 //    @Resource
 //    private PictureService pictureService;
 
-    /**
-     *上传图片
-     */
-    void shangchuan(String canshu){
-    }
-
-
-    /**
-     * 下载
-     */
-    void xiazai(String canshu){
-
-    }
+//    /**
+//     *上传图片
+//     */
+//    void shangchuan(String canshu){
+//    }
+//
+//
+//    /**
+//     * 下载
+//     */
+//    void xiazai(String canshu){
+//
+//    }
 }

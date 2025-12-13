@@ -8,6 +8,10 @@ spring:
     name: tutu
   profiles:
     active: pro
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      enabled: true
 
 mybatis-plus:
   configuration:
