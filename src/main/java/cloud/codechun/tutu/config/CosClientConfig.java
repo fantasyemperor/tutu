@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * @author leikooo
+ *  COS配置类  填写必要信息参数
  */
 @Configuration
 @ConfigurationProperties(prefix = "cos.client")
