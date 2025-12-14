@@ -32,23 +32,7 @@ public class ThreadPoolExecutorConfig {
             public Thread newThread(@NotNull Runnable r) {
                 // 创建一个新的线程
                 Thread thread = new Thread(r);
-                // 给新线程设置一个名称，名称中包含线程数的当前值package com.yupi.springbootinit.controller;
-                //
-                //import lombok.extern.slf4j.Slf4j;
-                //import org.springframework.web.bind.annotation.*;
-                //
-                ///**
-                // * 队列测试
-                // *
-                // * @author <a href="https://github.com/liyupi">程序员鱼皮</a>
-                // * @from <a href="https://yupi.icu">编程导航知识星球</a>
-                // */
-                //@RestController
-                //@RequestMapping("/queue")
-                //@Slf4j
-                //public class QueueController {
-                //
-                //}
+                // 给新线程设置一个名称，名称中包含线程数的当前值package ;
                 thread.setName("线程" + count);
                 // 线程数递增
                 count++;

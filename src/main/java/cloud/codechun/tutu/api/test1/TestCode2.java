@@ -46,7 +46,7 @@ public class TestCode2 {
     }
 
 
-    void videoImageListSample(String localPath1,String localPath2,String localPath3,String localPath4,String localPath5,String filename)
+    void videoImageListSample(String localPath1,String localPath2,String localPath3,String localPath4,String localPath5,String filename,String pName)
             throws ApiException, NoApiKeyException, UploadFileException, IOException {
 
         String base64Image1 = encodeImageToBase64(localPath1); // Base64编码
@@ -154,6 +154,8 @@ public class TestCode2 {
         Errordws errordws = new Errordws();
         errordws.setName(filename);
         errordws.setReason(firstChar);
+        errordws.setPname(pName);
+
 
         errordwsMapper.insert(errordws);
 
@@ -163,6 +165,8 @@ public class TestCode2 {
     //遍历父文件夹
     void processParentFolder(String parentFolder) {
         File parent = new File(parentFolder);
+        String parentName = parent.getName();
+
         File[] subFolders = parent.listFiles(File::isDirectory);
 
         if (subFolders == null) return;
@@ -193,7 +197,7 @@ public class TestCode2 {
                         images[2].getAbsolutePath().replace("\\", "/"),
                         images[3].getAbsolutePath().replace("\\", "/"),
                         images[4].getAbsolutePath().replace("\\", "/"),
-                        folder.getName()
+                        folder.getName(),parentName
                 );
 
 

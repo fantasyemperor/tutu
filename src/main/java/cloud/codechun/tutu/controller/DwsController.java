@@ -42,10 +42,10 @@ public class DwsController {
      * @return
      */
     @GetMapping("/test")
-    public String test(){
+    public void test(){
 
         testcode.run();
-        return "test";
+
     }
 
     /**
@@ -53,10 +53,10 @@ public class DwsController {
      * @return
      */
     @GetMapping("/test2")
-    public String test2(){
+    public void test2(){
 
         testcode2.run();
-        return "test";
+
     }
     }
 

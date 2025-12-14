@@ -17,6 +17,8 @@ public interface ErrordwsService extends IService<Errordws> {
 
 
 
+
+    void  run(String path);
     //导出为原因表
 
 
