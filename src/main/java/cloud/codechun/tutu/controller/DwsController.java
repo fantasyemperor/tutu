@@ -58,6 +58,12 @@ public class DwsController {
         testcode2.run();
 
     }
+
+    @PostMapping("/test4")
+    public void test4(String path){
+
+        errordwsServiceImpl.run(path);
+    }
     }
 
 

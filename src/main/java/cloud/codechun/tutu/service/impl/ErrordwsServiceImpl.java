@@ -88,7 +88,7 @@ public class ErrordwsServiceImpl extends ServiceImpl<ErrordwsMapper, Errordws>
                 try {
 
 //                System.out.println(images[0].getAbsolutePath().replace("\\", "/"));
-                    ;
+
                     for(File image:images){
                         String imagePath = image.getPath();
                         //调用单张图片分析有无面单方法
@@ -171,7 +171,7 @@ public class ErrordwsServiceImpl extends ServiceImpl<ErrordwsMapper, Errordws>
                     "是->回答3面单褶皱或者破损或者被遮挡并停止分析\n" +
                     "否->继续分析\n" +
                     "4.面单是否能清晰的读到条码\n" +
-                    "是->回答4面单未识别并停止分析\n" +
+                    "是->回答4条码清晰并停止分析\n" +
                     "否->回答3面单褶皱破损并停止分析\n" +
                     "\n" +
                     "注意：\n" +
@@ -228,13 +228,19 @@ public class ErrordwsServiceImpl extends ServiceImpl<ErrordwsMapper, Errordws>
             for (File subFolder : subFolders) {
 
                 Future<String> future =
-                        FolderAnalyzeThreadPool.EXECUTOR.submit(() -> {
-                            return analyzeByAi(subFolder,parentName);
-                        });
+                        FolderAnalyzeThreadPool.EXECUTOR.submit(() -> analyzeByAi(subFolder,parentName));
                 futures.add(future);
 
 
 
+            }
+
+            for (Future<String> future : futures) {
+                try {
+                    future.get();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -244,7 +250,8 @@ public class ErrordwsServiceImpl extends ServiceImpl<ErrordwsMapper, Errordws>
             try {
 
                 //文件夹绝对路径
-                String parentFolder = "C:\\Users\\17763\\Desktop\\222\\2025-11-29-2-1\\2-DWS-4";
+//                String parentFolder = "C:\\Users\\17763\\Desktop\\222\\2025-11-29-2-1\\2-DWS-4";
+                String parentFolder = path;
                 processParentFolder(parentFolder);
 
 
@@ -252,7 +259,8 @@ public class ErrordwsServiceImpl extends ServiceImpl<ErrordwsMapper, Errordws>
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
-            System.exit(0);
+
+
         }
 
 
@@ -260,7 +268,6 @@ public class ErrordwsServiceImpl extends ServiceImpl<ErrordwsMapper, Errordws>
      * 调用 AI 分析单个子文件夹（示意）
      */
     private String analyzeByAi(File folder,String parentName) throws InterruptedException {
-        // 模拟 AI 调用耗时
 
                         File[] images = folder.listFiles((dir, name) ->
                         name.toLowerCase().endsWith(".jpg") ||
@@ -270,6 +277,7 @@ public class ErrordwsServiceImpl extends ServiceImpl<ErrordwsMapper, Errordws>
 
         if (images == null || images.length < 5) {
             System.out.println("子文件夹 " + folder.getName() + " 图片不足五张，跳过。");
+            return "跳过：" + folder.getName();
         }
         // 按名字排序，确保固定顺序
         Arrays.sort(images);
