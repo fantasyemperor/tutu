@@ -1,11 +1,14 @@
 package cloud.codechun.tutu.mq;
 
+import cloud.codechun.tutu.service.ErrordwsService;
+import cloud.codechun.tutu.service.impl.ErrordwsServiceImpl;
 import com.rabbitmq.client.Channel;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.AmqpHeaders;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +18,11 @@ import org.springframework.stereotype.Component;
 // 使用@Slf4j注解生成日志记录器
 @Slf4j
 public class MyMessageConsumer {
+
+
+
+    @Autowired
+    private ErrordwsServiceImpl errordwsServiceImpl;
 
     /**
      * 接收消息的方法
@@ -34,6 +42,10 @@ public class MyMessageConsumer {
         log.info("receiveMessage message = {}", message);
         // 投递标签是一个数字标识,它在消息消费者接收到消息后用于向RabbitMQ确认消息的处理状态。通过将投递标签传递给channel.basicAck(deliveryTag, false)方法,可以告知RabbitMQ该消息已经成功处理,可以进行确认和从队列中删除。
         // 手动确认消息的接收，向RabbitMQ发送确认消息
+
+
+        errordwsServiceImpl.run(message);
+
         channel.basicAck(deliveryTag, false);
     }
 

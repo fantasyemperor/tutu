@@ -4,6 +4,7 @@ import cloud.codechun.tutu.api.aliyunai.MiandanDws;
 import cloud.codechun.tutu.api.aliyunai.TiaomaDws;
 import cloud.codechun.tutu.api.test1.TestCode;
 import cloud.codechun.tutu.api.test1.TestCode2;
+import cloud.codechun.tutu.mq.MyMessageProducer;
 import cloud.codechun.tutu.service.UserService;
 import cloud.codechun.tutu.service.impl.ErrordwsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,9 @@ public class DwsController {
     private TestCode testcode;
     @Autowired
     private TestCode2 testcode2;
+
+    @Autowired
+    private MyMessageProducer myMessageProducer;
 
     /**
      * 单张图片逐一分析 代码实现判断逻辑
@@ -64,7 +68,19 @@ public class DwsController {
 
         errordwsServiceImpl.run(path);
     }
+
+
+    /**
+     * 将path发送到rabbitmq
+     * @param path
+     */
+    @PostMapping("/test5")
+    public void test5(String path){
+        myMessageProducer.sendMessage("code_exchange","my_routingKey",path);
+
     }
+}
+
 
 
 
