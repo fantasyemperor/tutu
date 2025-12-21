@@ -1,6 +1,5 @@
 package cloud.codechun.tutu.service;
 
-import cloud.codechun.tutu.model.entity.Picture;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**

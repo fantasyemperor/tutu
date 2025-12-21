@@ -35,3 +35,6 @@ build/
 ### yml配置 ###
 application-pro.yml
 
+### 初始化mq ###
+**/MqInitMain.java
+

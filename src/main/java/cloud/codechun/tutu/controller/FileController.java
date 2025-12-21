@@ -1,10 +1,8 @@
 package cloud.codechun.tutu.controller;
 
 
-import cloud.codechun.tutu.annotation.AuthCheck;
 import cloud.codechun.tutu.common.BaseResponse;
 import cloud.codechun.tutu.common.ResultUtils;
-import cloud.codechun.tutu.constant.UserConstant;
 import cloud.codechun.tutu.exception.BusinessException;
 import cloud.codechun.tutu.exception.ErrorCode;
 import cloud.codechun.tutu.manager.CosManager;

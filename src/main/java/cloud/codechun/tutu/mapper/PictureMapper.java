@@ -1,6 +1,5 @@
 package cloud.codechun.tutu.mapper;
 
-import cloud.codechun.tutu.model.entity.Picture;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**

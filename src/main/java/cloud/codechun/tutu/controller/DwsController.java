@@ -1,5 +1,6 @@
 package cloud.codechun.tutu.controller;
 
+import cloud.codechun.tutu.annotation.AuthCheck;
 import cloud.codechun.tutu.api.aliyunai.MiandanDws;
 import cloud.codechun.tutu.api.aliyunai.TiaomaDws;
 import cloud.codechun.tutu.api.test1.TestCode;
@@ -74,6 +75,8 @@ public class DwsController {
      * 将path发送到rabbitmq
      * @param path
      */
+
+    @AuthCheck(mustRole = "admin")
     @PostMapping("/test5")
     public void test5(String path){
         myMessageProducer.sendMessage("code_exchange","my_routingKey",path);

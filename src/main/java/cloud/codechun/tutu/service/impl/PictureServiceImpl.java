@@ -1,7 +1,6 @@
 package cloud.codechun.tutu.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import cloud.codechun.tutu.model.entity.Picture;
 import cloud.codechun.tutu.service.PictureService;
 import cloud.codechun.tutu.mapper.PictureMapper;
 import org.springframework.stereotype.Service;
