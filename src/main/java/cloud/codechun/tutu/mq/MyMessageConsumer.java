@@ -2,6 +2,7 @@ package cloud.codechun.tutu.mq;
 
 import cloud.codechun.tutu.model.entity.MyMessage;
 import cloud.codechun.tutu.service.ErrordwsService;
+import cloud.codechun.tutu.service.JobService;
 import cloud.codechun.tutu.service.impl.ErrordwsServiceImpl;
 import com.rabbitmq.client.Channel;
 import lombok.SneakyThrows;
@@ -20,6 +21,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class MyMessageConsumer {
 
+
+    @Autowired
+    private JobService jobService;
 
 
     @Autowired
@@ -49,7 +53,16 @@ public class MyMessageConsumer {
         // 手动确认消息的接收，向RabbitMQ发送确认消息
 
 
+        jobService.setJob1(message);
+
+
         errordwsServiceImpl.run(message,username);
+
+
+
+
+
+
 
         channel.basicAck(deliveryTag, false);
     }

@@ -3,6 +3,8 @@ package cloud.codechun.tutu.service.impl;
 import cloud.codechun.tutu.api.aliyunai.MiandanDws;
 import cloud.codechun.tutu.api.aliyunai.TiaomaDws;
 import cloud.codechun.tutu.exception.BusinessException;
+import cloud.codechun.tutu.mapper.JobMapper;
+import cloud.codechun.tutu.model.entity.Job;
 import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversation;
 import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationParam;
 import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationResult;
@@ -62,76 +64,79 @@ public class ErrordwsServiceImpl extends ServiceImpl<ErrordwsMapper, Errordws>
     // 自动注入一个线程池的实例
     private ThreadPoolExecutor threadPoolExecutor;
 
+    @Resource
+    private JobServiceImpl jobServiceImpl;
 
 
 
-    @Override
-    public void jushi(String path) {
 
-        //调用单张图片分析有无面单方法
-//        String answer = miandanDws.run(path);
-
-
-        //调用单张图片分析有无条码方法
-//        String answer2 = tiaomaDws.run(path);
-
-
-            File parent = new File(path);
-            File[] subFolders = parent.listFiles(File::isDirectory);
-
-            if (subFolders == null) return;
-
-            for (File folder : subFolders) {
-                File[] images = folder.listFiles((dir, name) ->
-                        name.toLowerCase().endsWith(".jpg") ||
-                                name.toLowerCase().endsWith(".jpeg") ||
-                                name.toLowerCase().endsWith(".png")
-                );
-
-                if (images == null || images.length < 5) {
-                    System.out.println("子文件夹 " + folder.getName() + " 图片不足五张，跳过。");
-                    continue;
-                }
-
-                // 按名字排序，确保固定顺序
-                Arrays.sort(images);
-
-//                System.out.println(folder.getName());
-
-                try {
-
-//                System.out.println(images[0].getAbsolutePath().replace("\\", "/"));
-
-                    for(File image:images){
-                        String imagePath = image.getPath();
-                        //调用单张图片分析有无面单方法
-                        String answer= miandanDws.run(imagePath);
-                        if(answer.equals("y")){
-                            // 调用单张图片分析有无条码方法
-                            String answer2 = tiaomaDws.run(imagePath);
-                            if(answer2.equals("y")){
-                                System.out.println("有条码");
-
-                            }else {
-                                System.out.println("无条码");
-                            }
-
-                        }else {
-                            System.out.println("无面单");
-                        }
-
-
-
-                    }
-                    System.out.println("-------");
-
-
-                } catch (Exception e) {
-                    System.err.println("处理子文件夹时出错: " + folder.getName());
-                    e.printStackTrace();
-                }
-            }
-        }
+//    @Override
+//    public void jushi(String path) {
+//
+//        //调用单张图片分析有无面单方法
+////        String answer = miandanDws.run(path);
+//
+//
+//        //调用单张图片分析有无条码方法
+////        String answer2 = tiaomaDws.run(path);
+//
+//
+//            File parent = new File(path);
+//            File[] subFolders = parent.listFiles(File::isDirectory);
+//
+//            if (subFolders == null) return;
+//
+//            for (File folder : subFolders) {
+//                File[] images = folder.listFiles((dir, name) ->
+//                        name.toLowerCase().endsWith(".jpg") ||
+//                                name.toLowerCase().endsWith(".jpeg") ||
+//                                name.toLowerCase().endsWith(".png")
+//                );
+//
+//                if (images == null || images.length < 5) {
+//                    System.out.println("子文件夹 " + folder.getName() + " 图片不足五张，跳过。");
+//                    continue;
+//                }
+//
+//                // 按名字排序，确保固定顺序
+//                Arrays.sort(images);
+//
+////                System.out.println(folder.getName());
+//
+//                try {
+//
+////                System.out.println(images[0].getAbsolutePath().replace("\\", "/"));
+//
+//                    for(File image:images){
+//                        String imagePath = image.getPath();
+//                        //调用单张图片分析有无面单方法
+//                        String answer= miandanDws.run(imagePath);
+//                        if(answer.equals("y")){
+//                            // 调用单张图片分析有无条码方法
+//                            String answer2 = tiaomaDws.run(imagePath);
+//                            if(answer2.equals("y")){
+//                                System.out.println("有条码");
+//
+//                            }else {
+//                                System.out.println("无条码");
+//                            }
+//
+//                        }else {
+//                            System.out.println("无面单");
+//                        }
+//
+//
+//
+//                    }
+//                    System.out.println("-------");
+//
+//
+//                } catch (Exception e) {
+//                    System.err.println("处理子文件夹时出错: " + folder.getName());
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
 
 
     /**
@@ -239,25 +244,50 @@ public class ErrordwsServiceImpl extends ServiceImpl<ErrordwsMapper, Errordws>
             if (subFolders == null) return;
 
 
-            List<Future<String>> futures = new ArrayList<>();
+//            List<Future<String>> futures = new ArrayList<>();
+
+            List<CompletableFuture<Void>> futures = new ArrayList<>();
 
             for (File subFolder : subFolders) {
 
-                CompletableFuture.runAsync(() -> {
-                    // 打印一条日志信息，包括任务名称和执行线程的名称
-                    log.info("任务执行中：" + subFolder + "，执行人：" + Thread.currentThread().getName());
-                    try {
+//                CompletableFuture.runAsync(() -> {
+//                    // 打印一条日志信息，包括任务名称和执行线程的名称
+//                    log.info("任务执行中：" + subFolder + "，执行人：" + Thread.currentThread().getName());
+//                    try {
+//
+//                        analyzeByAi(subFolder, parentName, userName, parentFolder);
+//                    } catch (Exception e) {
+//                        jobServiceImpl.setError(parentFolder);
+//
+//                        e.printStackTrace();
+//                    }
+//                    // 异步任务在threadPoolExecutor中执行
+//                }, threadPoolExecutor);
 
-                        analyzeByAi(subFolder, parentName, userName);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    // 异步任务在threadPoolExecutor中执行
-                }, threadPoolExecutor);
+
+                CompletableFuture<Void> future =
+                        CompletableFuture.runAsync(() -> {
+                            log.info("任务执行中：" + subFolder + "，执行人：" + Thread.currentThread().getName());
+                            try {
+                                analyzeByAi(subFolder, parentName, userName, parentFolder);
+                            } catch (Exception e) {
+                                jobServiceImpl.setError(parentFolder);
+                                throw new RuntimeException(e); // 关键
+                            }
+                        }, threadPoolExecutor);
 
 
+                // ✅ 一定要 add
+                futures.add(future);
 
             }
+            CompletableFuture.allOf(
+                    futures.toArray(new CompletableFuture[0])
+            ).join();
+
+
+            jobServiceImpl.setJob2(parentFolder);
+
 
 
         }
@@ -265,6 +295,10 @@ public class ErrordwsServiceImpl extends ServiceImpl<ErrordwsMapper, Errordws>
 
        @Override
         public void  run(String path,String userName) {
+
+            jobServiceImpl.setJob1(path);
+
+
 
 
             try {
@@ -277,8 +311,12 @@ public class ErrordwsServiceImpl extends ServiceImpl<ErrordwsMapper, Errordws>
 
 
             } catch (Exception e) {
+                jobServiceImpl.setError(path);
                 System.out.println(e.getMessage());
             }
+
+
+
 
 
         }
@@ -287,7 +325,7 @@ public class ErrordwsServiceImpl extends ServiceImpl<ErrordwsMapper, Errordws>
     /**
      * 调用 AI 分析单个子文件夹（示意）
      */
-    private String analyzeByAi(File folder,String parentName,String userName) throws InterruptedException {
+    private String analyzeByAi(File folder,String parentName,String userName,String path) throws InterruptedException {
 
                         File[] images = folder.listFiles((dir, name) ->
                         name.toLowerCase().endsWith(".jpg") ||
@@ -306,9 +344,13 @@ public class ErrordwsServiceImpl extends ServiceImpl<ErrordwsMapper, Errordws>
         QueryWrapper queryWrapper = new QueryWrapper();
         queryWrapper.eq("name", folder.getName());
         if ((errordwsMapper.selectCount(queryWrapper)) !=0) {
+
+            jobServiceImpl.setError(path);
+
             throw new BusinessException(
                     PARAMS_ERROR,
                     "重复文件: \"" + folder.getName() + "\""
+
             );
 
         }
@@ -331,17 +373,36 @@ public class ErrordwsServiceImpl extends ServiceImpl<ErrordwsMapper, Errordws>
 
         } catch (Exception e) {
 
+                jobServiceImpl.setError(path);
 
                 throw new BusinessException(
                         PARAMS_ERROR,
                         "处理子文件夹时出错: \"" + folder.getName() + "\""
+
                 );
+
 
         }
 
+
         return "完成分析：" + folder.getName();
     }
+
+
+    @Override
+    public void getResult(String path) {
+
+        //todo
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.eq("name", path)
+        ;
+
+        int n1 = errordwsMapper.selectCount(queryWrapper);
+
+
+
     }
+}
 
 
 
