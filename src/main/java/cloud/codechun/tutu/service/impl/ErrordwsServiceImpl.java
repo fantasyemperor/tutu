@@ -397,7 +397,7 @@ public class ErrordwsServiceImpl extends ServiceImpl<ErrordwsMapper, Errordws>
         queryWrapper.eq("name", path)
         ;
 
-        int n1 = errordwsMapper.selectCount(queryWrapper);
+        Long n1 = errordwsMapper.selectCount(queryWrapper);
 
 
 
