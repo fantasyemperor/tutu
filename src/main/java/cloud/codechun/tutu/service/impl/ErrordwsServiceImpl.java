@@ -2,6 +2,7 @@ package cloud.codechun.tutu.service.impl;
 
 import cloud.codechun.tutu.api.aliyunai.MiandanDws;
 import cloud.codechun.tutu.api.aliyunai.TiaomaDws;
+import cloud.codechun.tutu.exception.BusinessException;
 import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversation;
 import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationParam;
 import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationResult;
@@ -10,11 +11,13 @@ import com.alibaba.dashscope.common.Role;
 import com.alibaba.dashscope.exception.ApiException;
 import com.alibaba.dashscope.exception.NoApiKeyException;
 import com.alibaba.dashscope.exception.UploadFileException;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import cloud.codechun.tutu.model.entity.Errordws;
 import cloud.codechun.tutu.service.ErrordwsService;
 import cloud.codechun.tutu.mapper.ErrordwsMapper;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +33,8 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
+
+import static cloud.codechun.tutu.exception.ErrorCode.PARAMS_ERROR;
 
 /**
 * @author 17763
@@ -142,7 +147,7 @@ public class ErrordwsServiceImpl extends ServiceImpl<ErrordwsMapper, Errordws>
         }
 
 
-        void imageListHandle(String localPath1,String localPath2,String localPath3,String localPath4,String localPath5,String filename,String pName)
+        void imageListHandle(String localPath1,String localPath2,String localPath3,String localPath4,String localPath5,String filename,String pName,String userName)
                 throws ApiException, NoApiKeyException, UploadFileException, IOException {
 
             String base64Image1 = encodeImageToBase64(localPath1); // Base64编码
@@ -212,6 +217,9 @@ public class ErrordwsServiceImpl extends ServiceImpl<ErrordwsMapper, Errordws>
             errordws.setName(filename);
             errordws.setReason(firstChar);
             errordws.setPname(pName);
+            errordws.setCreateTime(new Date());
+            errordws.setUserName(userName);
+
 
 
             errordwsMapper.insert(errordws);
@@ -220,7 +228,7 @@ public class ErrordwsServiceImpl extends ServiceImpl<ErrordwsMapper, Errordws>
 
 
         //遍历父文件夹
-        void processParentFolder(String parentFolder) {
+        void processParentFolder(String parentFolder,String userName) {
             File parent = new File(parentFolder);
             String parentName = parent.getName();
 
@@ -240,7 +248,7 @@ public class ErrordwsServiceImpl extends ServiceImpl<ErrordwsMapper, Errordws>
                     log.info("任务执行中：" + subFolder + "，执行人：" + Thread.currentThread().getName());
                     try {
 
-                        analyzeByAi(subFolder, parentName);
+                        analyzeByAi(subFolder, parentName, userName);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -256,13 +264,15 @@ public class ErrordwsServiceImpl extends ServiceImpl<ErrordwsMapper, Errordws>
 
 
        @Override
-        public void  run(String path) {
+        public void  run(String path,String userName) {
+
+
             try {
 
                 //文件夹绝对路径
 //                String parentFolder = "C:\\Users\\17763\\Desktop\\222\\2025-11-29-2-1\\2-DWS-4";
                 String parentFolder = path;
-                processParentFolder(parentFolder);
+                processParentFolder(parentFolder,userName);
 
 
 
@@ -277,7 +287,7 @@ public class ErrordwsServiceImpl extends ServiceImpl<ErrordwsMapper, Errordws>
     /**
      * 调用 AI 分析单个子文件夹（示意）
      */
-    private String analyzeByAi(File folder,String parentName) throws InterruptedException {
+    private String analyzeByAi(File folder,String parentName,String userName) throws InterruptedException {
 
                         File[] images = folder.listFiles((dir, name) ->
                         name.toLowerCase().endsWith(".jpg") ||
@@ -293,7 +303,15 @@ public class ErrordwsServiceImpl extends ServiceImpl<ErrordwsMapper, Errordws>
         Arrays.sort(images);
 
         System.out.println(folder.getName());
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.eq("name", folder.getName());
+        if ((errordwsMapper.selectCount(queryWrapper)) !=0) {
+            throw new BusinessException(
+                    PARAMS_ERROR,
+                    "重复文件: \"" + folder.getName() + "\""
+            );
 
+        }
 
 
         try {
@@ -305,13 +323,20 @@ public class ErrordwsServiceImpl extends ServiceImpl<ErrordwsMapper, Errordws>
                     images[2].getAbsolutePath().replace("\\", "/"),
                     images[3].getAbsolutePath().replace("\\", "/"),
                     images[4].getAbsolutePath().replace("\\", "/"),
-                    folder.getName(),parentName
+                    folder.getName(),
+                    parentName,
+                    userName
             );
 
 
         } catch (Exception e) {
-            System.err.println("处理子文件夹时出错: " + folder.getName());
-            e.printStackTrace();
+
+
+                throw new BusinessException(
+                        PARAMS_ERROR,
+                        "处理子文件夹时出错: \"" + folder.getName() + "\""
+                );
+
         }
 
         return "完成分析：" + folder.getName();

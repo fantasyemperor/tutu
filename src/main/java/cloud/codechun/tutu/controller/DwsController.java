@@ -5,9 +5,12 @@ import cloud.codechun.tutu.api.aliyunai.MiandanDws;
 import cloud.codechun.tutu.api.aliyunai.TiaomaDws;
 import cloud.codechun.tutu.api.test1.TestCode;
 import cloud.codechun.tutu.api.test1.TestCode2;
+import cloud.codechun.tutu.model.entity.MyMessage;
+import cloud.codechun.tutu.model.entity.User;
 import cloud.codechun.tutu.mq.MyMessageProducer;
 import cloud.codechun.tutu.service.UserService;
 import cloud.codechun.tutu.service.impl.ErrordwsServiceImpl;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,6 +34,8 @@ public class DwsController {
 
     @Autowired
     private MyMessageProducer myMessageProducer;
+    @Autowired
+    private UserService userService;
 
     /**
      * 单张图片逐一分析 代码实现判断逻辑
@@ -63,12 +68,12 @@ public class DwsController {
         testcode2.run();
 
     }
-
-    @PostMapping("/test4")
-    public void test4(String path){
-
-        errordwsServiceImpl.run(path);
-    }
+//
+//    @PostMapping("/test4")
+//    public void test4(String path){
+//
+//        errordwsServiceImpl.run(path);
+//    }
 
 
     /**
@@ -78,8 +83,13 @@ public class DwsController {
 
     @AuthCheck(mustRole = "admin")
     @PostMapping("/test5")
-    public void test5(String path){
-        myMessageProducer.sendMessage("code_exchange","my_routingKey",path);
+    public void test5(String path, HttpServletRequest request){
+        User user = userService.getLoginUser(request);
+        String useName = user.getUserAccount();
+        MyMessage mymessage = new MyMessage();
+        mymessage.setUsername(useName);
+        mymessage.setMessage(path);
+        myMessageProducer.sendMessage("code_exchange","my_routingKey",mymessage);
 
     }
 }

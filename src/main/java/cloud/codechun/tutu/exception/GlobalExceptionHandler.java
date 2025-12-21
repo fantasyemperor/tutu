@@ -2,7 +2,9 @@ package cloud.codechun.tutu.exception;
 
 import cloud.codechun.tutu.common.BaseResponse;
 import cloud.codechun.tutu.common.ResultUtils;
+import kotlin.Result;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -21,6 +23,8 @@ public class GlobalExceptionHandler {
         log.error("RuntimeException", e);
         return ResultUtils.error(ErrorCode.SYSTEM_ERROR, "系统错误");
     }
+
+
 }
 
 

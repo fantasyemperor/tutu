@@ -19,7 +19,7 @@ public interface ErrordwsService extends IService<Errordws> {
 
 
     // 使用线程池调用ai分析文件夹 path填单台DWS设备存图文件绝对路径
-    void  run(String path);
+    void  run(String path,String userName);
 
 
 }
