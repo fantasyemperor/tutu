@@ -1,10 +1,11 @@
 package cloud.codechun.tutu.service.impl;
 
-import cloud.codechun.tutu.api.aliyunai.MiandanDws;
-import cloud.codechun.tutu.api.aliyunai.TiaomaDws;
+import cloud.codechun.tutu.common.BaseResponse;
+import cloud.codechun.tutu.common.ResultUtils;
 import cloud.codechun.tutu.exception.BusinessException;
 import cloud.codechun.tutu.mapper.JobMapper;
 import cloud.codechun.tutu.model.entity.Job;
+import cloud.codechun.tutu.model.vo.DwsVO;
 import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversation;
 import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationParam;
 import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationResult;
@@ -19,11 +20,11 @@ import cloud.codechun.tutu.model.entity.Errordws;
 import cloud.codechun.tutu.service.ErrordwsService;
 import cloud.codechun.tutu.mapper.ErrordwsMapper;
 import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.View;
 
 
 import java.io.File;
@@ -33,10 +34,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import static cloud.codechun.tutu.exception.ErrorCode.PARAMS_ERROR;
+import static cloud.codechun.tutu.exception.ErrorCode.*;
 
 /**
 * @author 17763
@@ -48,10 +48,10 @@ import static cloud.codechun.tutu.exception.ErrorCode.PARAMS_ERROR;
 public class ErrordwsServiceImpl extends ServiceImpl<ErrordwsMapper, Errordws>
     implements ErrordwsService{
 
-    @Autowired
-    private MiandanDws  miandanDws;
-    @Autowired
-    private TiaomaDws tiaomaDws;
+//    @Autowired
+//    private MiandanDws  miandanDws;
+//    @Autowired
+//    private TiaomaDws tiaomaDws;
 
 
     @Value("${aliYunAi.apiKey}")
@@ -68,6 +68,8 @@ public class ErrordwsServiceImpl extends ServiceImpl<ErrordwsMapper, Errordws>
     private JobServiceImpl jobServiceImpl;
 
 
+    @Autowired
+    private JobMapper jobMapper;
 
 
 //    @Override
@@ -277,7 +279,7 @@ public class ErrordwsServiceImpl extends ServiceImpl<ErrordwsMapper, Errordws>
                         }, threadPoolExecutor);
 
 
-                // ✅ 一定要 add
+                //  一定要 add
                 futures.add(future);
 
             }
@@ -390,14 +392,87 @@ public class ErrordwsServiceImpl extends ServiceImpl<ErrordwsMapper, Errordws>
 
 
     @Override
-    public void getResult(String path) {
+    public BaseResponse<?> getResult(String path) {
+
+        File parent = new File(path);
+        String pname = parent.getName();
+
+        QueryWrapper<Job> queryWrapperJob = new QueryWrapper();
+        queryWrapperJob.eq("jobname", path);
+        Job job =jobMapper.selectOne(queryWrapperJob);
+        if (job != null) {
+            Integer status = job.getStatus();
+
+            if(status == 0){
+
+                return ResultUtils.error(NOT_FOUND_ERROR,"请求参数不存在");
+
+            }
+            if(status == 1){
+
+                return ResultUtils.error(OPERATION_ERROR,"任务进行中，请稍后");
+
+            }
+
+
+
+
+
+        } else {
+            return ResultUtils.error(NOT_FOUND_ERROR,"请求参数不存在");
+        }
+
+
+
+
+
+
+
 
         //todo
-        QueryWrapper queryWrapper = new QueryWrapper();
-        queryWrapper.eq("name", path)
-        ;
+        QueryWrapper<Errordws> queryWrapper1 = new QueryWrapper();
+        queryWrapper1.eq("pname", pname)
+                        .eq("reason","1");
 
-        Long n1 = errordwsMapper.selectCount(queryWrapper);
+
+        Long n1 = errordwsMapper.selectCount(queryWrapper1);
+
+        QueryWrapper<Errordws> queryWrapper2 = new QueryWrapper();
+        queryWrapper2.eq("pname", pname)
+                .eq("reason","2");
+        Long n2 = errordwsMapper.selectCount(queryWrapper2);
+
+        QueryWrapper<Errordws> queryWrapper3 = new QueryWrapper();
+        queryWrapper3.eq("pname", pname)
+        .eq("reason","3");
+        Long n3 = errordwsMapper.selectCount(queryWrapper3);
+
+        QueryWrapper<Errordws> queryWrapper4 = new QueryWrapper();
+        queryWrapper4.eq("pname", pname)
+        .eq("reason","4");
+        Long n4 = errordwsMapper.selectCount(queryWrapper4);
+
+
+        QueryWrapper<Errordws> queryWrapper = new QueryWrapper();
+        queryWrapper.eq("pname", pname);
+        Long n = errordwsMapper.selectCount(queryWrapper);
+
+        DwsVO dwsVO = new DwsVO();
+        dwsVO.setR1(n1);
+        dwsVO.setR2(n2);
+        dwsVO.setR3(n3);
+        dwsVO.setR4(n4);
+        dwsVO.setR(n);
+
+        return ResultUtils.success(dwsVO);
+
+
+
+
+
+
+
+
 
 
 

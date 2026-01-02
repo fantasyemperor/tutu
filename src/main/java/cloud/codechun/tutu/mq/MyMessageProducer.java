@@ -1,10 +1,11 @@
 package cloud.codechun.tutu.mq;
 
+
+
 import cloud.codechun.tutu.model.entity.MyMessage;
 import jakarta.annotation.Resource;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
-
 
 
 // 使用@Component注解标记该类为一个组件，让Spring框架能够扫描并将其纳入管理
@@ -24,5 +25,10 @@ public class MyMessageProducer {
         // 使用rabbitTemplate的convertAndSend方法将消息发送到指定的交换机和路由键
         rabbitTemplate.convertAndSend(exchange, routingKey, message);
     }
+
+
+
+
+
 
 }

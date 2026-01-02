@@ -5,6 +5,7 @@ import cloud.codechun.tutu.api.aliyunai.MiandanDws;
 import cloud.codechun.tutu.api.aliyunai.TiaomaDws;
 import cloud.codechun.tutu.api.test1.TestCode;
 import cloud.codechun.tutu.api.test1.TestCode2;
+import cloud.codechun.tutu.common.BaseResponse;
 import cloud.codechun.tutu.model.entity.MyMessage;
 import cloud.codechun.tutu.model.entity.User;
 import cloud.codechun.tutu.mq.MyMessageProducer;
@@ -86,8 +87,8 @@ public class DwsController {
 //     */
 
     @AuthCheck(mustRole = "admin")
-    @PostMapping("/test5")
-    public void test5(String path, HttpServletRequest request){
+    @PostMapping("/dws")
+    public void dws(String path, HttpServletRequest request){
         jobServiceImpl.setJob0(path);
 
         User user = userService.getLoginUser(request);
@@ -101,11 +102,13 @@ public class DwsController {
 
 
 
-    @GetMapping("/test6")
-    public void test6(String path,HttpServletRequest request){
+    @GetMapping("/result")
+    public BaseResponse result(String path){
 
 
-    errordwsServiceImpl.getResult(path);
+      return errordwsServiceImpl.getResult(path);
+
+
 
 
     }

@@ -1,5 +1,6 @@
 package cloud.codechun.tutu.service;
 
+import cloud.codechun.tutu.common.BaseResponse;
 import cloud.codechun.tutu.model.entity.Errordws;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -24,7 +25,7 @@ public interface ErrordwsService extends IService<Errordws> {
 
 
 
-    void getResult(String path);
+    BaseResponse<?> getResult(String path);
 
 
 }
